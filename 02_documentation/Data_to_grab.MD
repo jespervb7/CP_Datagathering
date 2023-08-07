@@ -2,13 +2,20 @@
 
 - Tournament info
     - Tournament_ID
-        - Randomly generated
+        - Randomly generated with UUID
+    - Created at
     - Date start
     - Date end
+    - City
+    - Country
     - Name
     - Year    
 - Matches
+    This table should be made **after** the tournament info table as the <tournament_id> is used
     - Tournament_ID
+    - Match_ID
+        - Randomly generated with UUID
+    - Created at
     - Date
     - 
     - First_team
@@ -16,6 +23,17 @@
     - First_team goals
     - Second_team goals
 - Ranking (if possible)
+    This table should be made **after** the tournament info table as the <tournament_id> is used
     - Tournament_ID
         - Randomly generated
-    
+    - Created at
+- Players
+    - Tournament_ID
+    - Player_ID
+        - Randomly generated
+    - Created at
+- Referees
+    - Tournament_ID
+    - Referee_ID
+        - Randomly generated
+    - Created at

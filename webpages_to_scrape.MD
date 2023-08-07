@@ -11,3 +11,11 @@
 - https://canoepolotournaments.com/
 - https://www.tourney.nz/#/
 - https://www.kayak-polo.info/
+- https://eca.torneopal.com/ 2018 ECC 
+- https://canoepolotournaments.com/
+- http://www.kayakpl.com/
+- https://bundesliga.kanupolo.de/
+- https://www.rfeplive.net/Championships/Index?especiality=KAYAK%20POLO
+- https://canoapolo.ficr.it/
+- https://prodigitalcanoepolo.com/\
+- http://www.cp-scheduler.net/
