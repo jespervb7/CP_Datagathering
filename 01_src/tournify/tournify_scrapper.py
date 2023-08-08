@@ -41,12 +41,24 @@ def get_url() -> str:
         user_url = input("Provide a proper link. An example link is: https://www.tournify.de/live/eca-cup-essen \n")
     else:
         return user_url
+    
+def get_html(base_url: str) -> str:
+    html_str = requests.get(base_url).text
+    # conncetion error?
+    # url not found - Call get url again.
+    return html_str
+
+def parse_html(base_url: str) -> BeautifulSoup:
+    html_str = get_html(base_url)
+
+    soup = BeautifulSoup(html_str, "html.parser")
 
 def main():
     """
     Main function to execute the script.
     """
     base_url = get_url()
+    home_page_html = parse_html(base_url)
 
 if __name__ == "__main__":    
     main()
