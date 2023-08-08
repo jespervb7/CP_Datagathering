@@ -1,5 +1,5 @@
 """
-[Script Name]
+[Script Name]:
 
 [Description]
 This script [provide a brief description of what the script does].
@@ -13,12 +13,6 @@ This script [provide a brief description of what the script does].
 
 [Author]
 [Your Name]
-
-[Contact]
-[Your Email Address]
-
-[License]
-This script is licensed under the [License Name] License.
 
 [Notes]
 - [Any additional notes or information you want to include.]
