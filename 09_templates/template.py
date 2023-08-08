@@ -25,8 +25,8 @@ This script is licensed under the [License Name] License.
 """
 
 # Import necessary libraries
-import os
-import sys
+
+from bs4 import BeautifulSoup
 import requests
 import pandas as pd
 # ... (add more imports as needed)
