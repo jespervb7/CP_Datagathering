@@ -18,13 +18,35 @@ This script scrapes data from the tournify website. It's made to be for the Cano
 from bs4 import BeautifulSoup
 import requests
 import pandas as pd
-# ... (add more imports as needed)
+import uuid
+
+def get_url() -> str:
+    """
+    This function prompts the user to give us an link to scrape from tournify.
+    There are checks in place to deal with invalid urls.
+
+    Returns:
+        str: returns the url to scrape the website with. 
+    """    
+
+    print("")
+    user_url = input("Please provide us the link of the tournament you want to scrape. An example link is: https://www.tournify.de/live/eca-cup-essen \n")
+    print("")
+    
+    if user_url[:20] != "https://www.tournify":
+        print("The script received a invalid link")
+        print("")
+        print(f"The url you provided is: {user_url}")
+        print("")
+        user_url = input("Provide a proper link. An example link is: https://www.tournify.de/live/eca-cup-essen \n")
+    else:
+        return user_url
 
 def main():
     """
     Main function to execute the script.
     """
-    # Your code here
+    base_url = get_url()
 
-if __name__ == "__main__":
+if __name__ == "__main__":    
     main()
