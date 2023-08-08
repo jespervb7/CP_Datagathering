@@ -7,5 +7,5 @@
 - Check the data
     - This is to make sure our program grabs the correct sort of data, if it's slightly off we don't want it(?)
     - We should probably write util functions for this
-- Roughly clean the data to fit the format described in the [Data_to_grab](02_documentation/Data_to_grab.MD) file
+- Roughly clean the data to fit the format described in the [Data_to_grab](../../../02_documentation/Data_to_grab.MD) file
 - Output the data to a simple CSV file. Eventually automate this to a database.
