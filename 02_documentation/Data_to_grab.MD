@@ -11,19 +11,21 @@
     - Name
     - Year    
 - Matches
-    This table should be made **after** the tournament info table as the <tournament_id> is used
+    This table should be made **after** the tournament info table. Tournament_ID does not exists before that point.
     - Tournament_ID
     - Match_ID
         - Randomly generated with UUID
     - Created at
     - Date
-    - 
+    - Stage
+        - The stages the tournament is in. Is it a group stage or the second group stage
+    - Poule
     - First_team
     - Second_team
     - First_team goals
     - Second_team goals
 - Ranking (if possible)
-    This table should be made **after** the tournament info table as the <tournament_id> is used
+    This table should be made **after** the tournament info table. Tournament_ID does not exists before that point.
     - Tournament_ID
         - Randomly generated
     - Created at
