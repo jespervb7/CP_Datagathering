@@ -44,6 +44,16 @@ def get_url() -> str:
         return user_url
     
 def get_html(base_url: str) -> str:
+    """
+    This functions handles the connection to the website and handles errors, if they occur.
+    It's supposed to return the html or end the script.
+
+    Args:
+        base_url (str): The url to make a request to
+
+    Returns:
+        str: returns the html in text format. So that it can be parsed later.
+    """    
 
     try:
         html_str = requests.get(base_url).text
@@ -54,7 +64,6 @@ def get_html(base_url: str) -> str:
         print("Check your network settings and try again")
         sys.exit(1)
 
-
 def parse_html(base_url: str) -> BeautifulSoup:
     html_str = get_html(base_url)
 
@@ -62,12 +71,15 @@ def parse_html(base_url: str) -> BeautifulSoup:
 
     return soup
 
-def main():
+def get_tournament_data(soup_object: BeautifulSoup):
+    pass
+
+def main() -> None:
     """
     Main function to execute the script.
     """
     base_url = get_url()
-    home_page_html = parse_html(base_url)
+    home_page_soup = parse_html(base_url)
 
 if __name__ == "__main__":    
     main()
