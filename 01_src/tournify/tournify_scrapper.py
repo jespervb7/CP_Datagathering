@@ -15,6 +15,7 @@ This script scrapes data from the tournify website. It's made to be for the Cano
 
 # Import necessary libraries
 
+from datetime import datetime
 from bs4 import BeautifulSoup
 import sys
 import requests
@@ -71,8 +72,13 @@ def parse_html(base_url: str) -> BeautifulSoup:
 
     return soup
 
-def get_tournament_data(soup_object: BeautifulSoup):
-    pass
+def get_tournament_data(soup_object: BeautifulSoup) -> tuple:
+    # Generate tournament ID
+    tournament_id = uuid.uuid4()
+    created_at = datetime.now()
+    print(soup_object)
+    title = soup_object.select_one("#root > div > div > div.container.header-top > div > div > h1").text
+    print(title)
 
 def main() -> None:
     """
@@ -80,6 +86,8 @@ def main() -> None:
     """
     base_url = get_url()
     home_page_soup = parse_html(base_url)
+
+    get_tournament_data(home_page_soup)
 
 if __name__ == "__main__":    
     main()
