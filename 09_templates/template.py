@@ -1,5 +1,5 @@
 """
-[Script Name]:
+[Script Name]
 
 [Description]
 This script [provide a brief description of what the script does].

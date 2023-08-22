@@ -1,8 +1,10 @@
 """
-[Script Name]:
+[Script Name]
+Tourney_scraper
 
 [Description]
-This script [provide a brief description of what the script does].
+This webscraper automatically scrapes webpages from the tourney website. 
+The website is for Canoe Polo matches and their scores. 
 
 [Usage]
 1. [Explain how to run the script and provide any necessary command-line arguments.]
