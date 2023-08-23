@@ -7,6 +7,7 @@ Once we have the JSON file we append the ID of each tournament to the following 
 
 # Requirements
 - This should be an automatted script, meaning we should be able to schedule it with cron
+    - For this I have decided to add a simple csv file containing the websites that are scrapped. Should be automated with a database eventually.
 - The data should be returned in some folder for further cleaning down the line. Once we have all the data we will create a cleaning project on github showcasing data cleaning.
 - CSV files should not be shown on git (add to gitignore)
 - We should store the links scraped somewhere so our script can check that first. However putting it into a database is something we will do later.

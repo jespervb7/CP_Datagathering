@@ -15,10 +15,9 @@ Jesper van Beemdelust
 """
 
 # Import necessary libraries
-
-from Utils.test import test
+ 
+from utils.get_web_data import get_html, parse_html
 from bs4 import BeautifulSoup
-import requests
 import pandas as pd
 
 
