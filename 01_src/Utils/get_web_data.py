@@ -1,5 +1,6 @@
-import requests
 from bs4 import BeautifulSoup
+import requests
+import sys
 
 def get_html(base_url: str) -> str:
     """
@@ -14,7 +15,7 @@ def get_html(base_url: str) -> str:
     """    
 
     try:
-        html_str = requests.get(base_url).text
+        html_str = requests.get(base_url)
         return html_str
     except requests.exceptions.RequestException as e:
         # Handles any network-related exceptions

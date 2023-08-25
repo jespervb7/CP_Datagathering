@@ -18,17 +18,23 @@ Jesper van Beemdelust
  
 from utils.get_web_data import get_html, parse_html
 from bs4 import BeautifulSoup
+import json
 import pandas as pd
 
+def get_tournaments_metadata() -> list:
 
-# ... (add more imports as needed)
+    tournaments_metadata = [["UUID", "Startdate", "Enddate"]]
+
+    response = get_html(base_url)
+    json_data = (response.json())
+
+
 
 def main():
-    """
-    Main function to execute the script.
-    """
-    # Your code here
+
+    # Grabbing the tournaments metadata. Links to their respective urls to start the webscrapping process
+    get_tournaments_metadata()
 
 if __name__ == "__main__":
+    base_url = "https://www.tourney.nz/data/tournaments"
     main()
-    test()
