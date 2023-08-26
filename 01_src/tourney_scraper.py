@@ -28,7 +28,24 @@ def get_tournaments_metadata() -> list:
     response = get_html(base_url)
     json_data = (response.json())
 
+    for tournament in json_data["tournaments"]:
+        original_uuid = tournament['id']['value']
 
+        try:
+            start_date = tournament["startDate"]["value"]
+        except TypeError:
+            print("Something went wrong with grabbing the start date")
+            start_date = None
+
+        try:
+            end_date = tournament["endDate"]["value"]
+        except TypeError:
+            print("Something went wrong with grabbing the end date")
+            end_date = None
+        
+        data_to_append = [original_uuid, start_date, end_date]
+        tournaments_metadata.append(data_to_append)
+    print(tournaments_metadata)
 
 def main():
 
