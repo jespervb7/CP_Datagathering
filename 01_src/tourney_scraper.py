@@ -16,7 +16,7 @@ Jesper van Beemdelust
 
 # Import necessary libraries
  
-from utils.get_web_data import get_html, parse_html
+from utils.get_web_data import get_html
 from bs4 import BeautifulSoup
 import json
 import pandas as pd
@@ -45,12 +45,28 @@ def get_tournaments_metadata() -> list:
         
         data_to_append = [original_uuid, start_date, end_date]
         tournaments_metadata.append(data_to_append)
-    print(tournaments_metadata)
+    return tournaments_metadata
+
+def get_tournament_data(tournament_uuid: str) -> list:
+    
+    url_to_send_get = f"https://www.tourney.nz/data/tournament/{tournament_uuid}" 
+        
+    response = get_html(url_to_send_get)
+    json_data = response.json
+
+    for gameday in json_data["gameDates"]:
+        gametimes = json_data["gameTimes"]
 
 def main():
 
     # Grabbing the tournaments metadata. Links to their respective urls to start the webscrapping process
-    get_tournaments_metadata()
+    tournaments_metadata = get_tournaments_metadata()
+
+    for tournament in tournaments_metadata:
+        if isinstance(tournament[0], str):
+            get_tournament_data(tournament[0])
+        else:
+            print("Invalid UUID")
 
 if __name__ == "__main__":
     base_url = "https://www.tourney.nz/data/tournaments"
