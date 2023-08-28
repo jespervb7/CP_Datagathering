@@ -49,23 +49,26 @@ def get_tournaments_metadata() -> list:
 
 def get_tournament_data(tournament_uuid: str) -> list:
     
-    url_to_send_get = f"https://www.tourney.nz/data/tournament/{tournament_uuid}" 
+    url_to_send_get = f"https://www.tourney.nz/data/tournament/{tournament_uuid}"
+    print(url_to_send_get)
         
     response = get_html(url_to_send_get)
-    json_data = response.json
+    json_data = response.text
+    print(json_data)
 
     for gameday in json_data["gameDates"]:
+        print(gameday)
         gametimes = gameday["gameTimes"]
 
         for pitch in gameday["pitches"]:
-            pass
+            print(pitch["id"]["value"])
 
 def main():
 
     # Grabbing the tournaments metadata. Links to their respective urls to start the webscrapping process
     tournaments_metadata = get_tournaments_metadata()
 
-    for tournament in tournaments_metadata:
+    for tournament in tournaments_metadata[1:]:
         if isinstance(tournament[0], str):
             get_tournament_data(tournament[0])
         else:
