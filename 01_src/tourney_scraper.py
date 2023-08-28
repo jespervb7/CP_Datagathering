@@ -55,7 +55,10 @@ def get_tournament_data(tournament_uuid: str) -> list:
     json_data = response.json
 
     for gameday in json_data["gameDates"]:
-        gametimes = json_data["gameTimes"]
+        gametimes = gameday["gameTimes"]
+
+        for pitch in gameday["pitches"]:
+            pass
 
 def main():
 
