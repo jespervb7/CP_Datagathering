@@ -17,7 +17,6 @@ Jesper van Beemdelust
 # Import necessary libraries
  
 from utils.get_web_data import get_html
-from bs4 import BeautifulSoup
 import json
 import pandas as pd
 
@@ -62,34 +61,78 @@ def get_match_data(tournament_uuid: str) -> list:
         list: Data of the tournament such as matches, teams played
     """
     
+    match_data_to_return = [["Date", "Time_of_day","Pitch","Poule", "Team 1", "Team1_Original", "Team1_Score", "Team1_Defaulted","Team 2", "Team2_Original", "team2_Score", "Team2_Defaulted", "Dutyteam", "Dutyteam_Original", "Gamestatus", "Match_UUID", "Tournament_UUID"]]
+
     url_to_send_get = f"https://www.tourney.nz/data/tournament/{tournament_uuid}"
-    print(url_to_send_get)
         
     response = get_html(url_to_send_get)
     json_data = (response.json())
     
-    #TODO: The code below is slightly ugly, but I couldn't come up with a quick neater solution. Too many nested loops which makes it hard to read.
+    #TODO: The code, the for loops, below is slightly ugly, but I couldn't come up with a quick neater solution. Too many nested loops which makes it hard to read.
 
     # Data is separeted by day
     for gameday in json_data["gameDates"]:
-        print(gameday)
+        gameday_date = gameday["date"]["value"]
         gametimes = gameday["gameTimes"]
 
-        # Counter to 
-        x = 0 
-
-        # For each day, data is seperated in pitches too.
+        # A game day can have multiple pitches.
         for pitch in gameday["pitches"]:
-            print(pitch["id"]["value"])
+            pitch_number = pitch["name"]
 
-            # For each match on pitch. Save the match data. 
+            # Counter for the matches played on a pitch. Start with 0 as it's used for slicing the gametimes and adding the gametime to the right match
+            match_counter = 0
+
+            # For each match on pitch. Save the match data.
+            for match in pitch["games"]:
+
+                match_time_of_day = gametimes[match_counter]
+                match_uuid = match["id"]["value"]
+                poule = match["group"]
+                team1 = match["team1"]
+                team1_original = match["team1Original"]
+                team1_score = match["team1Score"]
+                team1_defaulted = match["team1Defaulted"]
+                team2 = match["team2"]
+                team2_original = match["team2Original"]
+                team2_score = match["team2Score"]
+                team2_defaulted = match["team2Defaulted"]
+                dutyteam = match["dutyTeam"]
+                dutyteamoriginal = match["dutyTeamOriginal"]
+                gamestatus = match["status"]
+
+                data_to_append = [
+                    gameday_date,
+                    match_time_of_day,
+                    pitch_number,
+                    poule,
+                    team1,
+                    team1_original,
+                    team1_score,
+                    team1_defaulted,
+                    team2,
+                    team2_original,
+                    team2_score,
+                    team2_defaulted,
+                    dutyteam,
+                    dutyteamoriginal,
+                    gamestatus,
+                    match_uuid,
+                    tournament_uuid
+                 ]
+                
+                match_data_to_return.append(data_to_append)
+
+                match_counter += 1
+    df = pd.DataFrame(match_data_to_return)
+    df.to_csv("test.csv", index=False)
+
 
 def main():
 
     # Grabbing the tournaments metadata. Links to their respective urls to start the webscrapping process
     tournaments_metadata = get_tournaments_metadata()
 
-    for tournament in tournaments_metadata[10:11]:
+    for tournament in tournaments_metadata[9:10]:
         # Check for valid UUID 
         if isinstance(tournament[0], str):
             get_match_data(tournament[0])
