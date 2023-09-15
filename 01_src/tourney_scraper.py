@@ -23,6 +23,13 @@ import pandas as pd
 
 def get_tournaments_metadata() -> list:
 
+    """This function grabs the tournament metadata and returns it in a list.
+    The UUID's from each tournament are reused in the function: get_match_data. The uuid is concatinated to the url
+
+    Returns:
+        list: of tournament metadata, such as the start and enddate, but also the UUID.
+    """
+
     tournaments_metadata = [["UUID", "Startdate", "Enddate"]]
 
     response = get_html(base_url)
@@ -47,30 +54,45 @@ def get_tournaments_metadata() -> list:
         tournaments_metadata.append(data_to_append)
     return tournaments_metadata
 
-def get_tournament_data(tournament_uuid: str) -> list:
+def get_match_data(tournament_uuid: str) -> list:
+
+    """This function gets the data from each tournament and returns the data as a list
+
+    Returns:
+        list: Data of the tournament such as matches, teams played
+    """
     
     url_to_send_get = f"https://www.tourney.nz/data/tournament/{tournament_uuid}"
     print(url_to_send_get)
         
     response = get_html(url_to_send_get)
-    json_data = response.text
-    print(json_data)
+    json_data = (response.json())
+    
+    #TODO: The code below is slightly ugly, but I couldn't come up with a quick neater solution. Too many nested loops which makes it hard to read.
 
+    # Data is separeted by day
     for gameday in json_data["gameDates"]:
         print(gameday)
         gametimes = gameday["gameTimes"]
 
+        # Counter to 
+        x = 0 
+
+        # For each day, data is seperated in pitches too.
         for pitch in gameday["pitches"]:
             print(pitch["id"]["value"])
+
+            # For each match on pitch. Save the match data. 
 
 def main():
 
     # Grabbing the tournaments metadata. Links to their respective urls to start the webscrapping process
     tournaments_metadata = get_tournaments_metadata()
 
-    for tournament in tournaments_metadata[1:]:
+    for tournament in tournaments_metadata[10:11]:
+        # Check for valid UUID 
         if isinstance(tournament[0], str):
-            get_tournament_data(tournament[0])
+            get_match_data(tournament[0])
         else:
             print("Invalid UUID")
 
