@@ -17,9 +17,11 @@ Jesper van Beemdelust
 # Import necessary libraries
  
 from utils.get_web_data import get_html
+from datetime import datetime
 import json
 import pandas as pd
 
+#TODO: get tournament name from json, it's in there, but we forgot to put it in
 def get_tournaments_metadata() -> list:
 
     """This function grabs the tournament metadata and returns it in a list.
@@ -61,9 +63,10 @@ def get_match_data(tournament_uuid: str) -> list:
         list: Data of the tournament such as matches, teams played
     """
     
-    match_data_to_return = [["Date", "Time_of_day","Pitch","Poule", "Team 1", "Team1_Original", "Team1_Score", "Team1_Defaulted","Team 2", "Team2_Original", "team2_Score", "Team2_Defaulted", "Dutyteam", "Dutyteam_Original", "Gamestatus", "Match_UUID", "Tournament_UUID"]]
+    match_data_to_return = []
 
     url_to_send_get = f"https://www.tourney.nz/data/tournament/{tournament_uuid}"
+    print(url_to_send_get)
         
     response = get_html(url_to_send_get)
     json_data = (response.json())
@@ -72,6 +75,9 @@ def get_match_data(tournament_uuid: str) -> list:
 
     # Data is separeted by day
     for gameday in json_data["gameDates"]:
+
+        print(len(gameday["gameTimes"]))
+
         gameday_date = gameday["date"]["value"]
         gametimes = gameday["gameTimes"]
 
@@ -84,8 +90,10 @@ def get_match_data(tournament_uuid: str) -> list:
 
             # For each match on pitch. Save the match data.
             for match in pitch["games"]:
-
-                match_time_of_day = gametimes[match_counter]
+                try:
+                    match_time_of_day = gametimes[match_counter]
+                except IndexError:
+                    match_time_of_day = "Unknown"
                 match_uuid = match["id"]["value"]
                 poule = match["group"]
                 team1 = match["team1"]
@@ -123,21 +131,27 @@ def get_match_data(tournament_uuid: str) -> list:
                 match_data_to_return.append(data_to_append)
 
                 match_counter += 1
-    df = pd.DataFrame(match_data_to_return)
-    df.to_csv("test.csv", index=False)
 
+    return match_data_to_return
 
 def main():
 
     # Grabbing the tournaments metadata. Links to their respective urls to start the webscrapping process
     tournaments_metadata = get_tournaments_metadata()
 
-    for tournament in tournaments_metadata[9:10]:
+    match_data_list = [["Date", "Time_of_day","Pitch","Poule", "Team 1", "Team1_Original", "Team1_Score", "Team1_Defaulted","Team 2", "Team2_Original", "team2_Score", "Team2_Defaulted", "Dutyteam", "Dutyteam_Original", "Gamestatus", "Match_UUID", "Tournament_UUID"]]
+
+    for tournament in tournaments_metadata[1:]:
         # Check for valid UUID 
         if isinstance(tournament[0], str):
-            get_match_data(tournament[0])
+            match_data = get_match_data(tournament[0])
+            for row in match_data:
+                match_data_list.append(row)
         else:
             print("Invalid UUID")
+
+    df = pd.DataFrame(match_data_list)
+    df.to_csv("test.csv", index=False)
 
 if __name__ == "__main__":
     base_url = "https://www.tourney.nz/data/tournaments"
