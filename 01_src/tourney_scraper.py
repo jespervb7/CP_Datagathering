@@ -20,8 +20,8 @@ from utils.get_web_data import get_html
 from datetime import datetime
 import json
 import pandas as pd
+import uuid
 
-#TODO: get tournament name from json, it's in there, but we forgot to put it in
 def get_tournaments_metadata() -> list:
 
     """This function grabs the tournament metadata and returns it in a list.
@@ -31,13 +31,16 @@ def get_tournaments_metadata() -> list:
         list: of tournament metadata, such as the start and enddate, but also the UUID.
     """
 
-    tournaments_metadata = [["UUID", "Startdate", "Enddate"]]
+    tournaments_metadata = [["Raw_UUID", "Startdate", "Enddate", "Tournament_name", "ID"]]
 
     response = get_html(base_url)
     json_data = (response.json())
 
     for tournament in json_data["tournaments"]:
+        print(tournament)
         original_uuid = tournament['id']['value']
+        tournament_name = tournament["name"]
+        tournament_id = uuid.uuid4()
 
         try:
             start_date = tournament["startDate"]["value"]
@@ -51,11 +54,18 @@ def get_tournaments_metadata() -> list:
             print("Something went wrong with grabbing the end date")
             end_date = None
         
-        data_to_append = [original_uuid, start_date, end_date]
+        data_to_append = [
+            original_uuid, 
+            start_date, 
+            end_date, 
+            tournament_name,
+            tournament_id
+            ]
         tournaments_metadata.append(data_to_append)
+
     return tournaments_metadata
 
-def get_match_data(tournament_uuid: str) -> list:
+def get_match_data(tournament_uuid: str, tournament_id: str) -> list:
 
     """This function gets the data from each tournament and returns the data as a list
 
@@ -76,7 +86,9 @@ def get_match_data(tournament_uuid: str) -> list:
     # Data is separeted by day
     for gameday in json_data["gameDates"]:
 
-        print(len(gameday["gameTimes"]))
+        # If gametimes is empty. Skip that tournament.
+        if len(gameday["gameTimes"]) == 0:
+            continue
 
         gameday_date = gameday["date"]["value"]
         gametimes = gameday["gameTimes"]
@@ -125,7 +137,7 @@ def get_match_data(tournament_uuid: str) -> list:
                     dutyteamoriginal,
                     gamestatus,
                     match_uuid,
-                    tournament_uuid
+                    tournament_id
                  ]
                 
                 match_data_to_return.append(data_to_append)
@@ -141,10 +153,11 @@ def main():
 
     match_data_list = [["Date", "Time_of_day","Pitch","Poule", "Team 1", "Team1_Original", "Team1_Score", "Team1_Defaulted","Team 2", "Team2_Original", "team2_Score", "Team2_Defaulted", "Dutyteam", "Dutyteam_Original", "Gamestatus", "Match_UUID", "Tournament_UUID"]]
 
-    for tournament in tournaments_metadata[1:]:
+    # Grabbing data from each tournament
+    for tournament in tournaments_metadata[1:2]:
         # Check for valid UUID 
         if isinstance(tournament[0], str):
-            match_data = get_match_data(tournament[0])
+            match_data = get_match_data(tournament[0], tournament[4])
             for row in match_data:
                 match_data_list.append(row)
         else:
