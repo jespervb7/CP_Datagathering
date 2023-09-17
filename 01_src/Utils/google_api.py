@@ -63,7 +63,7 @@ def write_to_sheet(data: list, range_to_write: str, client) -> None:
         print("Invalid datatype, should input a list")
         sys.exit()
 
-    # ------------------------ Write to the sheet specified in the parameters -----------------
+    # Write to the sheet specified in the parameters
     request = client.spreadsheets().values().append(
         spreadsheetId="10_nr4Blz4z2kwdT0uIVsuo5Sy3mZSB-R5BPFP8A6B3o", 
         valueInputOption="RAW",
@@ -74,3 +74,21 @@ def write_to_sheet(data: list, range_to_write: str, client) -> None:
         })
 
     response = request.execute()
+
+def read_from_sheet(sheet_name: str, client) -> list:
+    """
+    This function should read data from a google sheet to multiple pandas dataframes
+    
+    - Sheets parameter
+        This variable takes a sheet name and will return a list
+    """
+
+    # Get's the data from a specific sheet
+    request = client.spreadsheets().values().get(
+        spreadsheetId="10_nr4Blz4z2kwdT0uIVsuo5Sy3mZSB-R5BPFP8A6B3o",
+        majorDimension='ROWS',
+        range=f"{sheet_name}!A1:Z1000000"
+        ).execute()
+    response = request['values']
+
+    return response
