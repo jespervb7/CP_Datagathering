@@ -17,7 +17,8 @@ Jesper van Beemdelust
 # Import necessary libraries
  
 from utils.get_web_data import get_html
-from datetime import datetime
+from utils.google_api import Create_Service, write_to_sheet, read_from_sheet
+import datetime
 import json
 import pandas as pd
 import uuid
@@ -31,16 +32,15 @@ def get_tournaments_metadata() -> list:
         list: of tournament metadata, such as the start and enddate, but also the UUID.
     """
 
-    tournaments_metadata = [["Raw_UUID", "Startdate", "Enddate", "Tournament_name", "ID"]]
+    tournaments_metadata = []
 
     response = get_html(base_url)
     json_data = (response.json())
 
     for tournament in json_data["tournaments"]:
-        print(tournament)
         original_uuid = tournament['id']['value']
         tournament_name = tournament["name"]
-        tournament_id = uuid.uuid4()
+        tournament_id = str(uuid.uuid4())
 
         try:
             start_date = tournament["startDate"]["value"]
@@ -65,7 +65,7 @@ def get_tournaments_metadata() -> list:
 
     return tournaments_metadata
 
-def get_match_data(tournament_uuid: str, tournament_id: str) -> list:
+def get_match_data(url: str, tournament_id: str) -> list:
 
     """This function gets the data from each tournament and returns the data as a list
 
@@ -75,10 +75,8 @@ def get_match_data(tournament_uuid: str, tournament_id: str) -> list:
     
     match_data_to_return = []
 
-    url_to_send_get = f"https://www.tourney.nz/data/tournament/{tournament_uuid}"
-    print(url_to_send_get)
-        
-    response = get_html(url_to_send_get)
+    print(url)
+    response = get_html(url)
     json_data = (response.json())
     
     #TODO: The code, the for loops, below is slightly ugly, but I couldn't come up with a quick neater solution. Too many nested loops which makes it hard to read.
@@ -119,26 +117,35 @@ def get_match_data(tournament_uuid: str, tournament_id: str) -> list:
                 dutyteam = match["dutyTeam"]
                 dutyteamoriginal = match["dutyTeamOriginal"]
                 gamestatus = match["status"]
+                current_datetime = str(datetime.datetime.now())
 
                 data_to_append = [
+                    match_uuid,
+                    None,
+                    poule,
                     gameday_date,
+                    None,
                     match_time_of_day,
                     pitch_number,
-                    poule,
                     team1,
-                    team1_original,
-                    team1_score,
-                    team1_defaulted,
                     team2,
-                    team2_original,
+                    team1_score,
                     team2_score,
-                    team2_defaulted,
+                    tournament_id,
+                    None,
+                    None,
                     dutyteam,
+                    None,
+                    current_datetime,
+                    None,
+                    None,
+                    team1_original,
+                    team2_original,
+                    team1_defaulted,
+                    team2_defaulted,
                     dutyteamoriginal,
-                    gamestatus,
-                    match_uuid,
-                    tournament_id
-                 ]
+                    gamestatus
+                ]
                 
                 match_data_to_return.append(data_to_append)
 
@@ -148,23 +155,44 @@ def get_match_data(tournament_uuid: str, tournament_id: str) -> list:
 
 def main():
 
+    # Launch the google API
+    service = Create_Service()
+
+    # Get the already scrapped webpages, to see if the ID exists
+    scrapper_data = read_from_sheet('Scrappers', service)
+    scrapper_links = []
+    for scrapped_link in scrapper_data:
+        scrapper_links.append(scrapped_link[1])
+
+    links_scrapped = []
+    match_data_list = []
+
     # Grabbing the tournaments metadata. Links to their respective urls to start the webscrapping process
     tournaments_metadata = get_tournaments_metadata()
 
-    match_data_list = [["Date", "Time_of_day","Pitch","Poule", "Team 1", "Team1_Original", "Team1_Score", "Team1_Defaulted","Team 2", "Team2_Original", "team2_Score", "Team2_Defaulted", "Dutyteam", "Dutyteam_Original", "Gamestatus", "Match_UUID", "Tournament_UUID"]]
-
     # Grabbing data from each tournament
-    for tournament in tournaments_metadata[1:2]:
-        # Check for valid UUID 
-        if isinstance(tournament[0], str):
-            match_data = get_match_data(tournament[0], tournament[4])
+    for tournament in tournaments_metadata[0:1]:
+
+        # Check if tournament has being scrapped before
+        if "https://www.tourney.nz/data/tournament/"+tournament[0] not in scrapper_links:
+            print(tournament)
+            url_to_scrape = f"https://www.tourney.nz/data/tournament/{tournament[0]}"
+
+            match_data = get_match_data(url_to_scrape, tournament[4])
+
+            print(len(match_data))
+            if len(match_data) > 2:
+                links_scrapped.append([0,url_to_scrape])
+
             for row in match_data:
                 match_data_list.append(row)
         else:
-            print("Invalid UUID")
+            print("Already scrapped")
 
-    df = pd.DataFrame(match_data_list)
-    df.to_csv("test.csv", index=False)
+    
+    if len(links_scrapped) > 0:
+        write_to_sheet(links_scrapped, "Scrappers!A1", service)
+        write_to_sheet(match_data_list,"Match_data!A1", service)   
 
 if __name__ == "__main__":
     base_url = "https://www.tourney.nz/data/tournaments"
