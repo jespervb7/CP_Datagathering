@@ -65,7 +65,7 @@ def get_tournaments_metadata() -> list:
 
     return tournaments_metadata
 
-def get_match_data(url: str, tournament_id: str) -> list:
+def get_match_data(url: str, tournament_id: str, tournament_raw_id) -> list:
 
     """This function gets the data from each tournament and returns the data as a list
 
@@ -100,11 +100,12 @@ def get_match_data(url: str, tournament_id: str) -> list:
 
             # For each match on pitch. Save the match data.
             for match in pitch["games"]:
+                match_uuid = str(uuid.uuid4)
                 try:
                     match_time_of_day = gametimes[match_counter]
                 except IndexError:
                     match_time_of_day = "Unknown"
-                match_uuid = match["id"]["value"]
+                match_id = match["id"]["value"]
                 poule = match["group"]
                 team1 = match["team1"]
                 team1_original = match["team1Original"]
@@ -144,14 +145,23 @@ def get_match_data(url: str, tournament_id: str) -> list:
                     team1_defaulted,
                     team2_defaulted,
                     dutyteamoriginal,
-                    gamestatus
+                    gamestatus,
+                    match_id
                 ]
                 
                 match_data_to_return.append(data_to_append)
 
+                game_event_data = get_match_events_data(tournament_raw_id,)
+
                 match_counter += 1
 
     return match_data_to_return
+
+def get_match_events_data(tournament_id, date_id, pitch_id, match_id, match_uuid) -> list:
+
+    url = f"https://www.tourney.nz/data/tournament/{tournament_id}/date/{date_id}/pitch/{pitch_id}/game/{match_id}"
+    
+    response = get_html()
 
 def main():
 
@@ -161,6 +171,8 @@ def main():
     # Get the already scrapped webpages, to see if the ID exists
     scrapper_data = read_from_sheet('Scrappers', service)
     scrapper_links = []
+
+    # Get all scraped links into a list so we can easily check if the link has being scraped
     for scrapped_link in scrapper_data:
         scrapper_links.append(scrapped_link[1])
 
@@ -178,7 +190,7 @@ def main():
             print(tournament)
             url_to_scrape = f"https://www.tourney.nz/data/tournament/{tournament[0]}"
 
-            match_data = get_match_data(url_to_scrape, tournament[4])
+            match_data = get_match_data(url_to_scrape, tournament[4], tournament[0])
 
             print(len(match_data))
             if len(match_data) > 2:
