@@ -167,31 +167,36 @@ def get_match_events_data(tournament_id, date_id, pitch_id, match_id, match_uuid
     json_data = (response.json())
     game_data = json_data["eventLog"]
 
-    raw_game_id = game_data["id"]["value"]
-    game_uuid = str(uuid.uuid4())
-    game_time = game_data["time"]
-    type_of_event = game_data["eventType"]
-    what_team_did_event = game_data["team"]
-    player = game_data["player"]
-    notes = game_data["notes"]
-    time_created = str(datetime.datetime.now())
+    data_to_return = []
 
-    data_to_return = [
-        raw_game_id,
-        game_uuid,
-        match_uuid,
-        game_time,
-        type_of_event,
-        what_team_did_event,
-        player,
-        notes,
-        time_created
-    ]
+    for event in game_data:
+        raw_game_id = event["id"]["value"]
+        game_uuid = str(uuid.uuid4())
+        game_time = event["time"]
+        type_of_event = event["eventType"]
+        what_team_did_event = event["team"]
+        player = event["player"]
+        notes = event["notes"]
+        time_created = str(datetime.datetime.now())
+
+        event_data = [
+            raw_game_id,
+            game_uuid,
+            match_uuid,
+            game_time,
+            type_of_event,
+            what_team_did_event,
+            player,
+            notes,
+            time_created
+        ]
+        
+        data_to_return.append(event_data)
 
     return data_to_return
 
 def main():
-
+    
     # Launch the google API
     service = Create_Service()
 
