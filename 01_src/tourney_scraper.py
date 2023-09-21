@@ -90,10 +90,12 @@ def get_match_data(url: str, tournament_id: str, tournament_raw_id) -> list:
 
         gameday_date = gameday["date"]["value"]
         gametimes = gameday["gameTimes"]
+        gameday_id = gameday["id"]["value"]
 
         # A game day can have multiple pitches.
         for pitch in gameday["pitches"]:
             pitch_number = pitch["name"]
+            pitch_id = pitch["id"]["value"]
 
             # Counter for the matches played on a pitch. Start with 0 as it's used for slicing the gametimes and adding the gametime to the right match
             match_counter = 0
@@ -151,7 +153,7 @@ def get_match_data(url: str, tournament_id: str, tournament_raw_id) -> list:
                 
                 match_data_to_return.append(data_to_append)
 
-                game_event_data = get_match_events_data(tournament_raw_id,)
+                game_event_data = get_match_events_data(tournament_raw_id, gameday_id, pitch_id, match_id, match_uuid)
 
                 match_counter += 1
 
@@ -160,6 +162,7 @@ def get_match_data(url: str, tournament_id: str, tournament_raw_id) -> list:
 def get_match_events_data(tournament_id, date_id, pitch_id, match_id, match_uuid) -> list:
 
     url = f"https://www.tourney.nz/data/tournament/{tournament_id}/date/{date_id}/pitch/{pitch_id}/game/{match_id}"
+    print(url)
     
     response = get_html()
 
@@ -203,8 +206,9 @@ def main():
 
     
     if len(links_scrapped) > 0:
+        
+        write_to_sheet(match_data_list,"Match_data!A1", service)
         write_to_sheet(links_scrapped, "Scrappers!A1", service)
-        write_to_sheet(match_data_list,"Match_data!A1", service)   
 
 if __name__ == "__main__":
     base_url = "https://www.tourney.nz/data/tournaments"
