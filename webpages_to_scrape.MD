@@ -9,6 +9,8 @@
     - https://www.tournify.de/live/kanupolodm2023/standings
 - https://cpt.kayakers.nl/
 - https://canoepolotournaments.com/
+- https://www.rfeplive.net/Championships/Index?especiality=KAYAK%20POLO
+- https://canoapolo.ficr.it/en
 - https://www.tourney.nz/#/
 - https://www.kayak-polo.info/
 - https://eca.torneopal.com/ 2018 ECC 
@@ -19,3 +21,11 @@
 - https://canoapolo.ficr.it/
 - https://prodigitalcanoepolo.com/\
 - http://www.cp-scheduler.net/
+- https://coimbra2019.spotfokus.com/event/games/1
+- https://www.friendsofallonby.org.uk/canoe-polo-international
+- https://www.theworldgames.org/sports/Canoe-62
+- https://gekko-tournament.com/
+- https://kayak-club-charleroi.be/?page_id=456
+- https://canoeingresults.com/canoe-polo/
+- https://paddle.org.au/paddlesports/canoe-polo/#1528488453622-c2f8c639-cdf9
+- https://canoekayak.ca/results/ < Somewhere down on that page there are canoe polo National league results
