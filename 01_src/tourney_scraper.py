@@ -74,6 +74,7 @@ def get_match_data(url: str, tournament_id: str, tournament_raw_id) -> list:
     """
     
     match_data_to_return = []
+    game_event_data_to_return = []
 
     print(url)
     response = get_html(url)
@@ -154,10 +155,11 @@ def get_match_data(url: str, tournament_id: str, tournament_raw_id) -> list:
                 match_data_to_return.append(data_to_append)
 
                 game_event_data = get_match_events_data(tournament_raw_id, gameday_id, pitch_id, match_id, match_uuid)
+                game_event_data_to_return.append(game_event_data)
 
                 match_counter += 1
 
-    return match_data_to_return
+    return match_data_to_return, game_event_data_to_return
 
 def get_match_events_data(tournament_id, date_id, pitch_id, match_id, match_uuid) -> list:
 
@@ -210,6 +212,7 @@ def main():
 
     links_scrapped = []
     match_data_list = []
+    match_event_data_list = []
 
     # Grabbing the tournaments metadata. Links to their respective urls to start the webscrapping process
     tournaments_metadata = get_tournaments_metadata()
@@ -229,7 +232,13 @@ def main():
                 links_scrapped.append([0,url_to_scrape])
 
             for row in match_data:
-                match_data_list.append(row)
+                match_data_list.append(row[0])
+                event_data = match_event_data_list.append(row[1])
+
+                for event in event_data:
+                    match_event_data_list.append(event)
+                    
+                print(match_event_data_list)
         else:
             print("Already scrapped")
 
