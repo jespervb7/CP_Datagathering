@@ -41,6 +41,7 @@ def get_tournaments_metadata() -> list:
         original_uuid = tournament['id']['value']
         tournament_name = tournament["name"]
         tournament_id = str(uuid.uuid4())
+        time_created = str(datetime.datetime.now())
 
         try:
             start_date = tournament["startDate"]["value"]
@@ -59,7 +60,9 @@ def get_tournaments_metadata() -> list:
             start_date, 
             end_date, 
             tournament_name,
-            tournament_id
+            tournament_id,
+            time_created,
+            1
             ]
         tournaments_metadata.append(data_to_append)
 
@@ -103,7 +106,7 @@ def get_match_data(url: str, tournament_id: str, tournament_raw_id) -> list:
 
             # For each match on pitch. Save the match data.
             for match in pitch["games"]:
-                match_uuid = str(uuid.uuid4)
+                match_uuid = str(uuid.uuid4())
                 try:
                     match_time_of_day = gametimes[match_counter]
                 except IndexError:
@@ -213,12 +216,15 @@ def main():
     links_scrapped = []
     match_data_list = []
     match_event_data_list = []
+    tournament_data_list = []
 
     # Grabbing the tournaments metadata. Links to their respective urls to start the webscrapping process
     tournaments_metadata = get_tournaments_metadata()
 
     # Grabbing data from each tournament
-    for tournament in tournaments_metadata[0:1]:
+    for tournament in tournaments_metadata:
+
+        tournament_data_list.append(tournament)
 
         # Check if tournament has being scrapped before
         if "https://www.tourney.nz/data/tournament/"+tournament[0] not in scrapper_links:
@@ -229,16 +235,15 @@ def main():
 
             print(len(match_data))
             if len(match_data) > 2:
-                links_scrapped.append([0,url_to_scrape])
+                links_scrapped.append([1,url_to_scrape])
 
-            for row in match_data:
-                match_data_list.append(row[0])
-                event_data = match_event_data_list.append(row[1])
+                for row in match_data:
+                    match_data_list.append(row[0])
+                    event_data = row[1]
 
-                for event in event_data:
-                    match_event_data_list.append(event)
+                    for event in event_data:
+                        match_event_data_list.append(event)
                     
-                print(match_event_data_list)
         else:
             print("Already scrapped")
 
@@ -246,7 +251,9 @@ def main():
     if len(links_scrapped) > 0:
         
         write_to_sheet(match_data_list,"Match_data!A1", service)
-        write_to_sheet(links_scrapped, "Scrappers!A1", service)
+        write_to_sheet(match_event_data_list, "Game_event_data!A1", service)
+        write_to_sheet(tournament_data_list, "Tournaments!A1", service)
+        write_to_sheet(links_scrapped, "Links_scraped!A1", service)
 
 if __name__ == "__main__":
     base_url = "https://www.tourney.nz/data/tournaments"
