@@ -23,12 +23,6 @@ import json
 import pandas as pd
 import uuid
 
-def replace_null_with_none(value):
-    if value == "null":
-        return None
-    else:
-        return value
-
 def get_tournaments_metadata() -> list:
 
     """This function grabs the tournament metadata and returns it in a list.
@@ -181,13 +175,13 @@ def get_match_events_data(tournament_id, date_id, pitch_id, match_id, match_uuid
     data_to_return = []
 
     for event in game_data:
+
         raw_game_id = event["id"]["value"]
         game_uuid = str(uuid.uuid4())
         game_time = event["time"]
         type_of_event = event["eventType"]
         what_team_did_event = event["team"]
         player = event["player"]
-        notes = event["notes"]
         time_created = str(datetime.datetime.now())
 
         event_data = [
@@ -198,14 +192,10 @@ def get_match_events_data(tournament_id, date_id, pitch_id, match_id, match_uuid
             type_of_event,
             what_team_did_event,
             player,
-            notes,
-            time_created,
-            url
+            None,
+            time_created
         ]
 
-        for i in range(len(event_data)):
-            event_data[i] = replace_null_with_none(event_data[i])
-        
         data_to_return.append(event_data)
 
     return data_to_return
@@ -232,9 +222,9 @@ def main():
     tournaments_metadata = get_tournaments_metadata()
 
     # Grabbing data from each tournament
-    for tournament in tournaments_metadata[0:6]:
+    for tournament in tournaments_metadata[0:7]:
 
-        tournament_data_list.append(tournament)
+        
 
         # Check if tournament has being scrapped before
         if "https://www.tourney.nz/data/tournament/"+tournament[0] not in scrapper_links:
@@ -250,15 +240,16 @@ def main():
 
             if difference <= datetime.timedelta(days=5):
 
+                tournament_data_list.append(tournament)
                 match_data = get_match_data(url_to_scrape, tournament[4], tournament[0])
 
                 links_scrapped.append([1,url_to_scrape])
 
                 for row in match_data[0]:
                     match_data_list.append(row)
-
                 for row in match_data[1]:
-                    match_event_data_list.append(row)
+                    for second_row in row:
+                        match_event_data_list.append(second_row)
             else:
                 print("Tournament not finished")
                     
@@ -266,7 +257,6 @@ def main():
             print("Already scrapped")
 
     if len(links_scrapped) > 0:
-        
         write_to_sheet(match_data_list,"Match_data!A1", service)
         write_to_sheet(match_event_data_list, "Game_event_data!A1", service)
         write_to_sheet(tournament_data_list, "Tournaments!A1", service)
