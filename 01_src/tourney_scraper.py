@@ -23,6 +23,12 @@ import json
 import pandas as pd
 import uuid
 
+def replace_null_with_none(value):
+    if value == "null":
+        return None
+    else:
+        return value
+
 def get_tournaments_metadata() -> list:
 
     """This function grabs the tournament metadata and returns it in a list.
@@ -161,7 +167,7 @@ def get_match_data(url: str, tournament_id: str, tournament_raw_id) -> list:
                 game_event_data_to_return.append(game_event_data)
 
                 match_counter += 1
-
+    
     return match_data_to_return, game_event_data_to_return
 
 def get_match_events_data(tournament_id, date_id, pitch_id, match_id, match_uuid) -> list:
@@ -193,8 +199,12 @@ def get_match_events_data(tournament_id, date_id, pitch_id, match_id, match_uuid
             what_team_did_event,
             player,
             notes,
-            time_created
+            time_created,
+            url
         ]
+
+        for i in range(len(event_data)):
+            event_data[i] = replace_null_with_none(event_data[i])
         
         data_to_return.append(event_data)
 
@@ -206,7 +216,7 @@ def main():
     service = Create_Service()
 
     # Get the already scrapped webpages, to see if the ID exists
-    scrapper_data = read_from_sheet('Scrappers', service)
+    scrapper_data = read_from_sheet('Links_scraped', service)
     scrapper_links = []
 
     # Get all scraped links into a list so we can easily check if the link has being scraped
@@ -222,7 +232,7 @@ def main():
     tournaments_metadata = get_tournaments_metadata()
 
     # Grabbing data from each tournament
-    for tournament in tournaments_metadata:
+    for tournament in tournaments_metadata[0:6]:
 
         tournament_data_list.append(tournament)
 
@@ -231,23 +241,30 @@ def main():
             print(tournament)
             url_to_scrape = f"https://www.tourney.nz/data/tournament/{tournament[0]}"
 
-            match_data = get_match_data(url_to_scrape, tournament[4], tournament[0])
+            # Build date check.
+            target_date_str = tournament[1]
+            target_date = datetime.datetime.strptime(target_date_str, "%Y-%m-%dT%H:%M:%S")
+            today = datetime.datetime.now()
 
-            print(len(match_data))
-            if len(match_data) > 2:
+            difference = target_date - today
+
+            if difference <= datetime.timedelta(days=5):
+
+                match_data = get_match_data(url_to_scrape, tournament[4], tournament[0])
+
                 links_scrapped.append([1,url_to_scrape])
 
-                for row in match_data:
-                    match_data_list.append(row[0])
-                    event_data = row[1]
+                for row in match_data[0]:
+                    match_data_list.append(row)
 
-                    for event in event_data:
-                        match_event_data_list.append(event)
+                for row in match_data[1]:
+                    match_event_data_list.append(row)
+            else:
+                print("Tournament not finished")
                     
         else:
             print("Already scrapped")
 
-    
     if len(links_scrapped) > 0:
         
         write_to_sheet(match_data_list,"Match_data!A1", service)
