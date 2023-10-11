@@ -222,7 +222,7 @@ def main():
     tournaments_metadata = get_tournaments_metadata()
 
     # Grabbing data from each tournament
-    for tournament in tournaments_metadata:
+    for tournament in tournaments_metadata[6:8]:
 
         # Check if tournament has being scrapped before
         if "https://www.tourney.nz/data/tournament/"+tournament[0] not in scrapper_links:
